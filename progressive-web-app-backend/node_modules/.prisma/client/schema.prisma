@@ -1,0 +1,72 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       String  @id @default(uuid())
+  email    String  @unique
+  name     String?
+  password String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Stores {
+  id        String  @id @default(uuid())
+  storeId   String  @unique
+  storeName String?
+  state     String?
+  city      String?
+
+  createdAt DateTime   @default(now())
+  Planning  Planning[]
+}
+
+model Sku {
+  id         String  @id @default(uuid())
+  skuId      String  @unique
+  skuName    String?
+  class      String?
+  department String?
+  price      String?
+  cost       String?
+
+  createdAt DateTime   @default(now())
+  Planning  Planning[]
+}
+
+model Week {
+  id         String  @id @default(uuid())
+  week       String?
+  weekName   String?
+  month      String?
+  monthLabel String?
+
+  createdAt DateTime @default(now())
+}
+
+model Planning {
+  id    String  @id @default(uuid())
+  week  String?
+  units String?
+
+  storeId String
+  skuId   String
+
+  store Stores @relation(fields: [storeId], references: [storeId])
+  sku   Sku    @relation(fields: [skuId], references: [skuId])
+
+  createdAt DateTime @default(now())
+}
