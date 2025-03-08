@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 
 const prisma = new PrismaClient();
 
-// CREATE Store
+// CREATE SKU
 export const createSku = async (req: Request, res: Response) => {
   const {
     skuName,
@@ -25,7 +25,7 @@ export const createSku = async (req: Request, res: Response) => {
   }
 };
 
-// GET STORES
+// GET SKU
 export const getSku = async (req: Request, res: Response) => {
   try {
     const sku = await prisma.sku.findMany();
@@ -36,7 +36,7 @@ export const getSku = async (req: Request, res: Response) => {
   }
 };
 
-//UPDATE Store
+//UPDATE SKU
 export const updateSku = async (req: Request, res: Response) => {
   const { skuId } = req.params;
 
@@ -64,6 +64,7 @@ export const updateSku = async (req: Request, res: Response) => {
   }
 };
 
+//Delete SKU
 export const deleteSku = async (req: Request, res: Response) => {
   const { skuId } = req.params;
 
