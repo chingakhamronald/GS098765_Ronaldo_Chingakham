@@ -2,22 +2,16 @@ import { Box } from "@mui/material";
 import { useCallback, useMemo, useState } from "react";
 import { AgGridReact } from "ag-grid-react";
 import {
+  CellStyleModule,
   ClientSideRowModelModule,
   ColDef,
   ColGroupDef,
-  GridApi,
-  GridOptions,
-  GridReadyEvent,
   ModuleRegistry,
   ValidationModule,
-  createGrid,
+  ValueParserParams,
 } from "ag-grid-community";
-import { initialPlaning } from "../data";
-import { initialSkuData } from "./Sku";
-import { initialStoresData } from "./Stores";
 import { usePlanning } from "../hooks/query/usePlanning";
-import { light } from "@mui/material/styles/createPalette";
-
+import "../index.css";
 export interface IPlaningData {
   store: string;
   sku: string;
@@ -29,18 +23,35 @@ export interface IPlaningData {
 
 ModuleRegistry.registerModules([
   ClientSideRowModelModule,
+  CellStyleModule,
   ValidationModule /* Development Only */,
 ]);
 
+const widthCell = 250;
+
 const Planning = () => {
+  const numberParser = (params: ValueParserParams) => {
+    console.log(params);
+    const newValue = params.newValue;
+    let valueAsNumber;
+    if (newValue === null || newValue === undefined || newValue === "") {
+      valueAsNumber = null;
+    } else {
+      valueAsNumber = parseFloat(params.newValue);
+    }
+    return valueAsNumber;
+  };
+
   const [columnDefs, setColumnDefs] = useState<(ColDef | ColGroupDef)[]>([
     {
       headerName: "Store",
       field: "store",
+      width: widthCell,
     },
     {
       headerName: "SKU",
       field: "sku",
+      width: widthCell,
     },
     {
       headerName: "Feb",
@@ -62,7 +73,15 @@ const Planning = () => {
             },
             {
               headerName: "GM Percent",
+              valueParser: numberParser,
               field: "gm_percent",
+              flex: 1,
+              cellClassRules: {
+                "rag-green": "x > 40",
+                "rag-yellow": "x >= 10 && x < 40",
+                "rag-orange": "x > 5 && x < 10",
+                "rag-red": "x <= 5",
+              },
             },
           ],
         },
@@ -70,27 +89,7 @@ const Planning = () => {
     },
   ]);
 
-  const {
-    data,
-    isLoading,
-    fetchNextPage,
-    hasNextPage,
-    hasPreviousPage,
-    fetchPreviousPage,
-    isFetchingNextPage,
-    isFetchingPreviousPage,
-  } = usePlanning(10);
-
-  console.log({
-    "SKU...": data,
-    "loading....": isLoading,
-    "fetchNextPage...": fetchNextPage,
-    "fetchPreviousPage...": fetchPreviousPage,
-    "NextPage...": hasNextPage,
-    "PreviousPage...": hasPreviousPage,
-    "isFetchNextPage...": isFetchingNextPage,
-    "isFetchPrevPage...": isFetchingPreviousPage,
-  });
+  const { data } = usePlanning(10);
 
   const priceCal = useCallback((e: any) => {
     let u = Math.round(e.units.split("$").pop());
@@ -128,9 +127,17 @@ const Planning = () => {
   return (
     <Box
       component="main"
-      sx={{ flexGrow: 1, p: 3, marginX: 30, height: "90vh" }}
+      sx={{
+        display: "flex",
+        p: 3,
+        marginX: 30,
+        height: "calc(100vh - 64px)",
+        width: "calc(100vw - 240px)",
+      }}
     >
-      <AgGridReact rowData={rowData} columnDefs={columnDefs} />
+      <Box sx={{ height: "100%", width: "100%", flexGrow: 1 }}>
+        <AgGridReact<IPlaningData> rowData={rowData} columnDefs={columnDefs} />
+      </Box>
     </Box>
   );
 };

@@ -1,13 +1,15 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { instanceAxios } from "../../App";
 
-export const usePlanning = (limit = 10) => {
+export const usePlanning = (limit = 20) => {
   return useInfiniteQuery({
     queryKey: ["planning", limit],
     queryFn: async ({ pageParam = 1 }) => {
       const res = await instanceAxios.get(
         `/planning?page=${pageParam}&limit=${limit}`
       );
+
+      console.log(res);
       return await res.data;
     },
     getNextPageParam: (nextPage, allPage) => {

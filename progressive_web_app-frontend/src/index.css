@@ -6,3 +6,17 @@ body {
   min-width: 1080px;
   margin: auto;
 }
+
+.rag-red {
+  background-color: #cc222244;
+}
+.rag-green {
+  background-color: #33cc3344;
+}
+.rag-yellow {
+  background-color: #ffffc5;
+}
+
+.rag-orange {
+  background-color: #ffdbbb;
+}
