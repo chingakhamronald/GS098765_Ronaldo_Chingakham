@@ -15,6 +15,8 @@ import {
 import { initialPlaning } from "../data";
 import { initialSkuData } from "./Sku";
 import { initialStoresData } from "./Stores";
+import { usePlanning } from "../hooks/query/usePlanning";
+import { light } from "@mui/material/styles/createPalette";
 
 export interface IPlaningData {
   store: string;
@@ -31,9 +33,6 @@ ModuleRegistry.registerModules([
 ]);
 
 const Planning = () => {
-  const containerStyle = useMemo(() => ({ width: "100%", height: "100%" }), []);
-  const gridStyle = useMemo(() => ({ height: "100%", width: "100%" }), []);
-  const [rowData, setRowData] = useState<IPlaningData[]>();
   const [columnDefs, setColumnDefs] = useState<(ColDef | ColGroupDef)[]>([
     {
       headerName: "Store",
@@ -50,20 +49,19 @@ const Planning = () => {
           headerName: "Week 01",
           children: [
             {
-              headerClass: "Sales Units",
-
+              headerName: "Sales Units",
               field: "sales_units",
             },
             {
-              headerClass: "Sales Dollers",
-              field: "sales_dollers",
+              headerName: "Sales Dollers",
+              field: "sales_dollars",
             },
             {
-              headerClass: "GM Dollars",
-              field: "gm_dollers",
+              headerName: "GM Dollars",
+              field: "gm_dollars",
             },
             {
-              headerClass: "GM Percent",
+              headerName: "GM Percent",
               field: "gm_percent",
             },
           ],
@@ -72,20 +70,67 @@ const Planning = () => {
     },
   ]);
 
+  const {
+    data,
+    isLoading,
+    fetchNextPage,
+    hasNextPage,
+    hasPreviousPage,
+    fetchPreviousPage,
+    isFetchingNextPage,
+    isFetchingPreviousPage,
+  } = usePlanning(10);
+
   console.log({
-    "SKU...": initialSkuData.slice(0, 10),
-    "Stores....": initialStoresData,
+    "SKU...": data,
+    "loading....": isLoading,
+    "fetchNextPage...": fetchNextPage,
+    "fetchPreviousPage...": fetchPreviousPage,
+    "NextPage...": hasNextPage,
+    "PreviousPage...": hasPreviousPage,
+    "isFetchNextPage...": isFetchingNextPage,
+    "isFetchPrevPage...": isFetchingPreviousPage,
   });
+
+  const priceCal = useCallback((e: any) => {
+    let u = Math.round(e.units.split("$").pop());
+    let p = Math.round(e.sku.price.split("$").pop());
+    let c = Math.round(e.sku.cost.split("$").pop());
+
+    const saleDollar = u * p;
+    const gmDollar = saleDollar - u * c;
+
+    return { saleDollar, gmDollar };
+  }, []);
+
+  const rowData = useMemo(() => {
+    if (!data) return [];
+
+    return data.pages.flatMap((e) =>
+      e.data.map((item: any) => {
+        const calDollarAndCost = priceCal(item);
+
+        return {
+          store: item.store.storeName,
+          sku: item.sku.skuName,
+          sales_units: item.units,
+          sales_dollars: `$ ${calDollarAndCost.saleDollar.toFixed(2)}`,
+          gm_dollars: `$ ${calDollarAndCost.gmDollar.toFixed(2)}`,
+          gm_percent: (
+            (calDollarAndCost.gmDollar / calDollarAndCost.saleDollar) *
+            100
+          ).toFixed(2),
+        };
+      })
+    );
+  }, [data]);
 
   return (
     <Box
       component="main"
       sx={{ flexGrow: 1, p: 3, marginX: 30, height: "90vh" }}
     >
-      <AgGridReact<IPlaningData>
-        rowData={initialPlaning}
-        columnDefs={columnDefs}
-      />
+      <AgGridReact rowData={rowData} columnDefs={columnDefs} />
     </Box>
   );
 };
