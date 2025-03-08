@@ -1,4 +1,4 @@
-import { Box } from "@mui/material";
+import { Box, Paper } from "@mui/material";
 import { useCallback, useMemo, useState } from "react";
 import { AgGridReact } from "ag-grid-react";
 import {
@@ -98,8 +98,9 @@ const Planning = () => {
 
     const saleDollar = u * p;
     const gmDollar = saleDollar - u * c;
+    const gmPercent = (gmDollar / saleDollar) * 100;
 
-    return { saleDollar, gmDollar };
+    return { saleDollar, gmDollar, gmPercent };
   }, []);
 
   const rowData = useMemo(() => {
@@ -115,10 +116,7 @@ const Planning = () => {
           sales_units: item.units,
           sales_dollars: `$ ${calDollarAndCost.saleDollar.toFixed(2)}`,
           gm_dollars: `$ ${calDollarAndCost.gmDollar.toFixed(2)}`,
-          gm_percent: (
-            (calDollarAndCost.gmDollar / calDollarAndCost.saleDollar) *
-            100
-          ).toFixed(2),
+          gm_percent: calDollarAndCost.gmPercent.toFixed(2),
         };
       })
     );
@@ -135,7 +133,10 @@ const Planning = () => {
         width: "calc(100vw - 240px)",
       }}
     >
-      <Box sx={{ height: "100%", width: "100%", flexGrow: 1 }}>
+      <Box
+        sx={{ height: "100%", width: "100%", flexGrow: 1 }}
+        component={Paper}
+      >
         <AgGridReact<IPlaningData> rowData={rowData} columnDefs={columnDefs} />
       </Box>
     </Box>

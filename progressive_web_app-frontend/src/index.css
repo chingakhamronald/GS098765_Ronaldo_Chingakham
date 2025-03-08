@@ -20,3 +20,11 @@ body {
 .rag-orange {
   background-color: #ffdbbb;
 }
+
+.container {
+  display: flex;
+  padding: 3;
+  margin: 30;
+  height: "calc(100vh - 64px)";
+  width: "calc(100vw - 240px)";
+}
