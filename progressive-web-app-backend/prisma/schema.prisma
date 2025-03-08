@@ -35,38 +35,37 @@ model Stores {
 }
 
 model Sku {
-  id         String  @id @default(uuid())
-  skuId      String  @unique
+  id         String     @id @default(uuid())
+  skuId      String     @unique
   skuName    String?
   class      String?
   department String?
   price      String?
   cost       String?
-
-  createdAt DateTime   @default(now())
-  Planning  Planning[]
+  createdAt  DateTime   @default(now())
+  Planning   Planning[]
 }
 
 model Week {
-  id         String  @id @default(uuid())
-  week       String?
+  id         String     @id @default(uuid())
+  week       String     @unique
   weekName   String?
   month      String?
   monthLabel String?
-
-  createdAt DateTime @default(now())
+  createdAt  DateTime   @default(now())
+  Planning   Planning[]
 }
 
 model Planning {
-  id    String  @id @default(uuid())
-  week  String?
-  units String?
-
+  id      String  @id @default(uuid())
+  units   String?
   storeId String
   skuId   String
+  week    String
 
-  store Stores @relation(fields: [storeId], references: [storeId])
-  sku   Sku    @relation(fields: [skuId], references: [skuId])
+  weekId Week   @relation(fields: [week], references: [week])
+  store  Stores @relation(fields: [storeId], references: [storeId])
+  sku    Sku    @relation(fields: [skuId], references: [skuId])
 
   createdAt DateTime @default(now())
 }
