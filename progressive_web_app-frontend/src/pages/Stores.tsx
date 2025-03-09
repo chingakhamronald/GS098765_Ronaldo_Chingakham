@@ -1,8 +1,16 @@
-import { Box } from "@mui/material";
+import { Box, CircularProgress } from "@mui/material";
 import CustomTable from "../components/CustomTable";
 import { GridColDef } from "@mui/x-data-grid";
 import { FC } from "react";
-import stores from "../data/stores.json";
+import { useStores } from "../hooks/query/useStores";
+
+interface IStore {
+  id: string;
+  storeId: string;
+  state: string;
+  storeName: string;
+  city: string;
+}
 
 const column: GridColDef[] = [
   {
@@ -31,18 +39,45 @@ const column: GridColDef[] = [
   },
 ];
 
-export const initialStoresData = stores.map((e) => ({
-  id: e["Seq No."],
-  storeID: e["ID"],
-  state: e["State"],
-  city: e["City"],
-  store: e["Label"],
-}));
-
 const Stores: FC = () => {
+  const { data, isLoading, isFetching } = useStores();
+
+  const initialStoresData = data?.data.map((e: IStore, idx: number) => ({
+    id: idx + 1,
+    storeID: e.storeId,
+    state: e.state,
+    city: e.city,
+    store: e.storeName,
+  }));
+
   return (
-    <Box component="main" sx={{ flexGrow: 1, p: 3, marginX: 30 }}>
-      <CustomTable col={column} init={initialStoresData} />
+    <Box
+      component="main"
+      sx={{
+        display: "flex",
+        p: 3,
+        marginX: 30,
+        height: "calc(100vh - 64px)",
+        width: "calc(100vw - 240px)",
+      }}
+    >
+      <Box sx={{ height: "100%", width: "100%", flexGrow: 1 }}>
+        {isFetching && isLoading ? (
+          <Box
+            sx={{
+              alignItems: "center",
+              display: "flex",
+              justifyContent: "center",
+              height: "100%",
+              width: "100%",
+            }}
+          >
+            <CircularProgress color="secondary" size={25} />
+          </Box>
+        ) : (
+          <CustomTable col={column} init={initialStoresData} />
+        )}
+      </Box>
     </Box>
   );
 };
