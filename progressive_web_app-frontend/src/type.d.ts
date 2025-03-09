@@ -1,6 +1,9 @@
+import { ElementType, ReactElement, ReactNode } from "react";
+
 export interface IListData {
   title: string;
   href: string;
+  icon?: ElementType;
 }
 
 export interface IStorePostData {

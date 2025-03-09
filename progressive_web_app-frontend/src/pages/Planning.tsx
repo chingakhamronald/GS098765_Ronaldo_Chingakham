@@ -77,7 +77,7 @@ const Planning = () => {
               field: "gm_percent",
               flex: 1,
               cellClassRules: {
-                "rag-green": "x > 40",
+                "rag-green": "x >= 40",
                 "rag-yellow": "x >= 10 && x < 40",
                 "rag-orange": "x > 5 && x < 10",
                 "rag-red": "x <= 5",
@@ -89,7 +89,7 @@ const Planning = () => {
     },
   ]);
 
-  const { data } = usePlanning(10);
+  const { data } = usePlanning(20);
 
   const priceCal = useCallback((e: any) => {
     let u = Math.round(e.units.split("$").pop());

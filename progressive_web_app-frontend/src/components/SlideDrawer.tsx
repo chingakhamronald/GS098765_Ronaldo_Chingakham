@@ -29,16 +29,20 @@ export default function SildeDrawer() {
         <Toolbar />
         <Box sx={{ overflow: "auto" }}>
           <List>
-            {ListData.map((e, index) => (
-              <ListItem key={index} disablePadding>
-                <ListItemButton href={e.href}>
-                  <ListItemIcon>
-                    {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                  </ListItemIcon>
-                  <ListItemText primary={e.title} />
-                </ListItemButton>
-              </ListItem>
-            ))}
+            {ListData.map((e, index) => {
+              const Icon = e.icon;
+
+              return (
+                <ListItem key={index} disablePadding>
+                  <ListItemButton href={e.href}>
+                    <ListItemIcon>
+                      <ListItemIcon>{Icon && <Icon />}</ListItemIcon>
+                    </ListItemIcon>
+                    <ListItemText primary={e.title} />
+                  </ListItemButton>
+                </ListItem>
+              );
+            })}
           </List>
         </Box>
       </Drawer>
