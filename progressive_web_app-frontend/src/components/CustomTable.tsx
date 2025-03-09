@@ -33,6 +33,8 @@ declare module "@mui/x-data-grid" {
 interface ICustomTableProps {
   col: GridColDef[];
   init: GridRowsProp;
+  mutate: any;
+  name: string;
 }
 
 function EditToolbar(props: GridSlotProps["toolbar"]) {
@@ -65,7 +67,7 @@ function EditToolbar(props: GridSlotProps["toolbar"]) {
   );
 }
 
-const CustomTable: FC<ICustomTableProps> = ({ col, init }) => {
+const CustomTable: FC<ICustomTableProps> = ({ col, init, mutate, name }) => {
   const [rows, setRows] = useState(init);
 
   const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
@@ -104,8 +106,31 @@ const CustomTable: FC<ICustomTableProps> = ({ col, init }) => {
   };
 
   const processRowUpdate = (newRow: GridRowModel) => {
+    console.log({ "newRole....": newRow });
     const updatedRow = { ...newRow, isNew: false };
-    setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
+
+    let storeData = {};
+
+    switch (name) {
+      case "store":
+        storeData = {
+          storeId: newRow.storeID,
+          storeName: newRow.store,
+          city: newRow.city,
+          state: newRow.state,
+        };
+        break;
+
+      default:
+        break;
+    }
+
+    mutate(storeData, {
+      onSuccess: () => {
+        setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
+      },
+    });
+
     return updatedRow;
   };
 

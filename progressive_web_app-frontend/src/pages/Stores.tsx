@@ -3,14 +3,8 @@ import CustomTable from "../components/CustomTable";
 import { GridColDef } from "@mui/x-data-grid";
 import { FC } from "react";
 import { useStores } from "../hooks/query/useStores";
-
-interface IStore {
-  id: string;
-  storeId: string;
-  state: string;
-  storeName: string;
-  city: string;
-}
+import { useUpdateStore } from "../hooks/mutation/useUpdateStore";
+import { IStore } from "../type";
 
 const column: GridColDef[] = [
   {
@@ -41,7 +35,7 @@ const column: GridColDef[] = [
 
 const Stores: FC = () => {
   const { data, isLoading, isFetching } = useStores();
-
+  const { mutate } = useUpdateStore();
   const initialStoresData = data?.data.map((e: IStore, idx: number) => ({
     id: idx + 1,
     storeID: e.storeId,
@@ -75,7 +69,12 @@ const Stores: FC = () => {
             <CircularProgress color="secondary" size={25} />
           </Box>
         ) : (
-          <CustomTable col={column} init={initialStoresData} />
+          <CustomTable
+            col={column}
+            init={initialStoresData}
+            mutate={mutate}
+            name="store"
+          />
         )}
       </Box>
     </Box>
