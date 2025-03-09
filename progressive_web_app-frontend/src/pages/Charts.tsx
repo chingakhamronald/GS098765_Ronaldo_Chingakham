@@ -1,4 +1,4 @@
-import { Box } from "@mui/material";
+import { Box, CircularProgress } from "@mui/material";
 import { AgCharts } from "ag-charts-react";
 import {
   AgBarSeriesOptions,
@@ -6,7 +6,6 @@ import {
   AgChartCaptionOptions,
   AgChartLegendOptions,
   AgChartOptions,
-  AgChartSubtitleOptions,
   AgLineSeriesOptions,
   AgNumberAxisOptions,
 } from "ag-charts-community";
@@ -14,7 +13,7 @@ import { useCallback, useMemo } from "react";
 import { usePlanningsData } from "../hooks/query/usePlainningsData";
 
 const Charts = () => {
-  const { data } = usePlanningsData();
+  const { data, isLoading, isFetching } = usePlanningsData();
 
   // Function to calculate sales and GM data
   const priceCal = useCallback((e: any) => {
@@ -123,7 +122,21 @@ const Charts = () => {
       }}
     >
       <Box sx={{ height: "100%", width: "100%", flexGrow: 1 }}>
-        <AgCharts options={options} />
+        {isFetching && isLoading ? (
+          <Box
+            sx={{
+              alignItems: "center",
+              display: "flex",
+              justifyContent: "center",
+              height: "100%",
+              width: "100%",
+            }}
+          >
+            <CircularProgress color="secondary" size={25} />
+          </Box>
+        ) : (
+          <AgCharts options={options} />
+        )}
       </Box>
     </Box>
   );
