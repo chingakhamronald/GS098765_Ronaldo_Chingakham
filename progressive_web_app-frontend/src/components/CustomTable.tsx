@@ -33,7 +33,7 @@ declare module "@mui/x-data-grid" {
 interface ICustomTableProps {
   col: GridColDef[];
   init: GridRowsProp;
-  mutate: any;
+  mutate?: any;
   name: string;
 }
 
@@ -105,6 +105,7 @@ const CustomTable: FC<ICustomTableProps> = ({ col, init, mutate, name }) => {
     }
   };
 
+  //update store and sku
   const processRowUpdate = (newRow: GridRowModel) => {
     console.log({ "newRole....": newRow });
     const updatedRow = { ...newRow, isNew: false };
@@ -148,6 +149,8 @@ const CustomTable: FC<ICustomTableProps> = ({ col, init, mutate, name }) => {
       cellClassName: "actions",
       getActions: ({ id }) => {
         const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
+
+        console.log({ "id...": id });
 
         if (isInEditMode) {
           return [
