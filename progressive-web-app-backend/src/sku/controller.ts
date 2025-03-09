@@ -40,7 +40,7 @@ export const getSku = async (req: Request, res: Response) => {
 export const updateSku = async (req: Request, res: Response) => {
   const { skuId } = req.params;
 
-  const { skuName, cost, price } = req.body;
+  const { cost, price } = req.body;
 
   try {
     const existingStore = await prisma.sku.findUnique({
@@ -55,12 +55,12 @@ export const updateSku = async (req: Request, res: Response) => {
 
     const updateStore = await prisma.sku.update({
       where: { skuId },
-      data: { skuId, skuName, cost, price },
+      data: { cost, price },
     });
 
     res.status(200).json({ success: true, data: updateStore });
   } catch (error) {
-    res.status(500).json({ success: false, message: "Failed to update store" });
+    res.status(500).json({ success: false, message: "Failed to update sku" });
   }
 };
 
