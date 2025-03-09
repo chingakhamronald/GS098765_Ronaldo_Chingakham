@@ -59,3 +59,45 @@ export const getPlanning = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, message: "Internal server error!" });
   }
 };
+
+export const getAllPlanning = async (req: Request, res: Response) => {
+  try {
+    //Fetching data
+    const planning = await prisma.planning.findMany({
+      select: {
+        week: true,
+        units: true,
+        store: {
+          select: {
+            storeId: true,
+            storeName: true,
+            city: true,
+            state: true,
+          },
+        },
+        sku: {
+          select: {
+            skuId: true,
+            skuName: true,
+            price: true,
+            cost: true,
+          },
+        },
+        weekId: {
+          select: {
+            month: true,
+            monthLabel: true,
+            weekName: true,
+          },
+        },
+      },
+    });
+
+    res.status(200).json({
+      success: true,
+      data: planning,
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Internal server error!" });
+  }
+};
