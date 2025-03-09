@@ -4,6 +4,7 @@ import { GridColDef, GridColTypeDef } from "@mui/x-data-grid";
 import { currencyFormatter } from "../utils";
 import { useSku } from "../hooks/query/useSku";
 import { ISku } from "../type";
+import { useUpdateSku } from "../hooks/mutation/useUpdateSku";
 
 const usdPrice: GridColTypeDef = {
   type: "number",
@@ -33,6 +34,7 @@ const column: GridColDef[] = [
 ];
 const Sku = () => {
   const { data, isLoading, isFetching } = useSku();
+  const { mutate } = useUpdateSku();
 
   const initialSkuData = data?.data.map((e: ISku, idx: number) => {
     const price = e.price.split("$").pop();
@@ -41,6 +43,7 @@ const Sku = () => {
     return {
       id: idx + 1,
       sku: e.skuName,
+      skuId: e.skuId,
       price,
       cost,
     };
@@ -71,7 +74,12 @@ const Sku = () => {
             <CircularProgress color="secondary" size={25} />
           </Box>
         ) : (
-          <CustomTable col={column} init={initialSkuData} name="sku" />
+          <CustomTable
+            col={column}
+            init={initialSkuData}
+            name="sku"
+            mutate={mutate}
+          />
         )}
       </Box>
     </Box>

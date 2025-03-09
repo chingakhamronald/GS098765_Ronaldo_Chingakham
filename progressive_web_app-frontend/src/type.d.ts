@@ -21,7 +21,7 @@ export interface ISkuPostData {
 
 export interface ISku extends ISkuPostData {
   id: string;
-  uuid: string;
+  skuId: string;
   skuName: string;
   class: string;
   department: string;

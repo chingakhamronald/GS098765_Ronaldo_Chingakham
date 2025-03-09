@@ -121,8 +121,12 @@ const CustomTable: FC<ICustomTableProps> = ({ col, init, mutate, name }) => {
           state: newRow.state,
         };
         break;
-
       default:
+        storeData = {
+          skuId: newRow.skuId,
+          cost: `${newRow.cost}`,
+          price: `${newRow.price}`,
+        };
         break;
     }
 
