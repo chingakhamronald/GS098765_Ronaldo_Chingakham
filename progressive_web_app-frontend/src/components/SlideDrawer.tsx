@@ -1,3 +1,4 @@
+import { NavLink, useLocation } from "react-router-dom";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
 import Toolbar from "@mui/material/Toolbar";
@@ -6,13 +7,11 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
-import MailIcon from "@mui/icons-material/Mail";
 import { ListData } from "../contants";
 
 export const drawerWidth = 240;
 
-export default function SildeDrawer() {
+export default function SlideDrawer() {
   return (
     <Box sx={{ display: "flex" }}>
       <Drawer
@@ -34,9 +33,23 @@ export default function SildeDrawer() {
 
               return (
                 <ListItem key={index} disablePadding>
-                  <ListItemButton href={e.href}>
-                    <ListItemIcon>
-                      <ListItemIcon>{Icon && <Icon />}</ListItemIcon>
+                  <ListItemButton
+                    component={NavLink}
+                    to={e.href}
+                    sx={{
+                      "&.active": {
+                        backgroundColor: "secondary.main",
+                        color: "white",
+                      },
+                    }}
+                  >
+                    <ListItemIcon
+                      sx={{
+                        color: "inherit",
+                        ".active &": { color: "primary.main" },
+                      }}
+                    >
+                      {Icon && <Icon />}
                     </ListItemIcon>
                     <ListItemText primary={e.title} />
                   </ListItemButton>
