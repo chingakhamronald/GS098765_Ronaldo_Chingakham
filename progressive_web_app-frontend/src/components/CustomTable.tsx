@@ -48,12 +48,11 @@ function EditToolbar(props: GridSlotProps["toolbar"]) {
     const nextId = (rows.length + 1).toString();
 
     setRows((oldRows) => [
-      ...oldRows,
       { id: nextId, store: "", state: "", city: "", isNew: true },
+      ...oldRows,
     ]);
     setRowModesModel((oldModel) => ({
       ...oldModel,
-
       [nextId]: { mode: GridRowModes.Edit, fieldToFocus: editableFields },
     }));
   };
@@ -154,22 +153,19 @@ const CustomTable: FC<ICustomTableProps> = ({ col, init, mutate, name }) => {
       getActions: ({ id }) => {
         const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
 
-        console.log({ "id...": id });
-
         if (isInEditMode) {
           return [
             <GridActionsCellItem
               icon={<SaveIcon />}
               label="Save"
-              color="inherit"
+              color="success"
               onClick={handleSaveClick(id)}
             />,
             <GridActionsCellItem
               icon={<CancelIcon />}
               label="Cancel"
-              className="textPrimary"
               onClick={handleCancelClick(id)}
-              color="inherit"
+              color="error"
             />,
           ];
         }
