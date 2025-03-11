@@ -47,10 +47,27 @@ function EditToolbar(props: GridSlotProps["toolbar"]) {
   const handleClick = () => {
     const nextId = (rows.length + 1).toString();
 
-    setRows((oldRows) => [
-      { id: nextId, store: "", state: "", city: "", isNew: true },
-      ...oldRows,
-    ]);
+    setRows((oldRows) => {
+      const skuId = "SK" + Math.floor(1000 + Math.random() * 9000);
+      const storeId = "ST" + Math.floor(1000 + Math.random() * 9000);
+
+      const keyAbstract = Object.keys(oldRows[0]);
+      const newRow = Object.fromEntries(keyAbstract.map((key) => [key, ""]));
+
+      let newEntryData: any = {
+        ...newRow,
+        id: nextId,
+      };
+
+      if ("skuId" in newRow) {
+        newEntryData.skuId = skuId;
+      } else {
+        newEntryData.storeID = storeId;
+      }
+
+      return [newEntryData, ...oldRows];
+    });
+
     setRowModesModel((oldModel) => ({
       ...oldModel,
       [nextId]: { mode: GridRowModes.Edit, fieldToFocus: editableFields },
