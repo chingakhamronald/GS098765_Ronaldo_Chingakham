@@ -35,7 +35,6 @@ const column: GridColDef[] = [
 
 const Stores: FC = () => {
   const { data, isLoading, isFetching } = useStores();
-  const { mutate } = useUpdateStore();
   const initialStoresData = data?.data.map((e: IStore, idx: number) => ({
     id: idx + 1,
     storeID: e.storeId,
@@ -69,12 +68,7 @@ const Stores: FC = () => {
             <CircularProgress color="secondary" size={25} />
           </Box>
         ) : (
-          <CustomTable
-            col={column}
-            init={initialStoresData}
-            mutate={mutate}
-            name="store"
-          />
+          <CustomTable col={column} init={initialStoresData} name="store" />
         )}
       </Box>
     </Box>

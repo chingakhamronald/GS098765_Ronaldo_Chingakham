@@ -13,12 +13,15 @@ import {
   GridSlotProps,
   GridToolbarContainer,
 } from "@mui/x-data-grid";
-import { FC, useState } from "react";
+import { FC, use, useState } from "react";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Close";
 import AddIcon from "@mui/icons-material/Add";
+import { useUpdateStore } from "../hooks/mutation/useUpdateStore";
+import { useCreateStore } from "../hooks/mutation/useCreateStore";
+import { IStorePostData } from "../type";
 
 declare module "@mui/x-data-grid" {
   interface ToolbarPropsOverrides {
@@ -33,7 +36,6 @@ declare module "@mui/x-data-grid" {
 interface ICustomTableProps {
   col: GridColDef[];
   init: GridRowsProp;
-  mutate?: any;
   name: string;
 }
 
@@ -57,6 +59,7 @@ function EditToolbar(props: GridSlotProps["toolbar"]) {
       let newEntryData: any = {
         ...newRow,
         id: nextId,
+        isNew: true,
       };
 
       if ("skuId" in newRow) {
@@ -83,10 +86,14 @@ function EditToolbar(props: GridSlotProps["toolbar"]) {
   );
 }
 
-const CustomTable: FC<ICustomTableProps> = ({ col, init, mutate, name }) => {
+const CustomTable: FC<ICustomTableProps> = ({ col, init, name }) => {
   const [rows, setRows] = useState(init);
 
   const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
+
+  const { mutate } = useUpdateStore();
+
+  const { mutate: createMutate } = useCreateStore();
 
   const handleRowEditStop: GridEventListener<"rowEditStop"> = (
     params,
@@ -116,6 +123,7 @@ const CustomTable: FC<ICustomTableProps> = ({ col, init, mutate, name }) => {
     });
 
     const editedRow = rows.find((row) => row.id === id);
+
     if (editedRow!.isNew) {
       setRows(rows.filter((row) => row.id !== id));
     }
@@ -123,10 +131,9 @@ const CustomTable: FC<ICustomTableProps> = ({ col, init, mutate, name }) => {
 
   //update store and sku
   const processRowUpdate = (newRow: GridRowModel) => {
-    console.log({ "newRole....": newRow });
     const updatedRow = { ...newRow, isNew: false };
 
-    let storeData = {};
+    let storeData: any = {};
 
     switch (name) {
       case "store":
@@ -136,6 +143,7 @@ const CustomTable: FC<ICustomTableProps> = ({ col, init, mutate, name }) => {
           city: newRow.city,
           state: newRow.state,
         };
+
         break;
       default:
         storeData = {
@@ -143,14 +151,23 @@ const CustomTable: FC<ICustomTableProps> = ({ col, init, mutate, name }) => {
           cost: `${newRow.cost}`,
           price: `${newRow.price}`,
         };
+
         break;
     }
 
-    mutate(storeData, {
-      onSuccess: () => {
-        setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
-      },
-    });
+    if (newRow.isNew) {
+      createMutate(storeData, {
+        onSuccess: () => {
+          setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
+        },
+      });
+    } else {
+      mutate(storeData, {
+        onSuccess: () => {
+          setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
+        },
+      });
+    }
 
     return updatedRow;
   };
