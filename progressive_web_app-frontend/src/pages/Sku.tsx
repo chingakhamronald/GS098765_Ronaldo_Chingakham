@@ -6,6 +6,7 @@ import { useSku } from "../hooks/query/useSku";
 import { ISku } from "../type";
 import { useUpdateSku } from "../hooks/mutation/useUpdateSku";
 import { useCreateSku } from "../hooks/mutation/useCreateSku";
+import { useDeleteSku } from "../hooks/mutation/useDeleteSku";
 
 const usdPrice: GridColTypeDef = {
   type: "number",
@@ -38,6 +39,8 @@ const Sku = () => {
   const { mutate } = useUpdateSku();
 
   const { mutate: createSku } = useCreateSku();
+
+  const { mutate: removeSku } = useDeleteSku();
 
   const initialSkuData = data?.data.map((e: ISku, idx: number) => {
     const price = e.price.split("$").pop();
@@ -83,6 +86,7 @@ const Sku = () => {
             name="sku"
             createMutate={createSku}
             updateMutate={mutate}
+            deleteMutate={removeSku}
           />
         )}
       </Box>
