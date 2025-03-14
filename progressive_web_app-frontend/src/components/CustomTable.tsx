@@ -19,8 +19,6 @@ import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Close";
 import AddIcon from "@mui/icons-material/Add";
-import { useUpdateStore } from "../hooks/mutation/useUpdateStore";
-import { useCreateStore } from "../hooks/mutation/useCreateStore";
 
 declare module "@mui/x-data-grid" {
   interface ToolbarPropsOverrides {
@@ -38,6 +36,7 @@ interface ICustomTableProps {
   name: string;
   updateMutate?: any;
   createMutate?: any;
+  deleteMutate?: any;
 }
 
 function EditToolbar(props: GridSlotProps["toolbar"]) {
@@ -92,6 +91,7 @@ const CustomTable: FC<ICustomTableProps> = ({
   init,
   name,
   createMutate,
+  deleteMutate,
   updateMutate,
 }) => {
   const [rows, setRows] = useState(init);
@@ -115,8 +115,9 @@ const CustomTable: FC<ICustomTableProps> = ({
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
   };
 
-  const handleDeleteClick = (id: GridRowId) => () => {
-    setRows(rows.filter((row) => row.id !== id));
+  const handleDeleteClick = (id: GridRowId, storeId: string) => () => {
+    deleteMutate(storeId);
+    setRows(rows.filter((e) => e.id !== id));
   };
 
   const handleCancelClick = (id: GridRowId) => () => {
@@ -187,7 +188,7 @@ const CustomTable: FC<ICustomTableProps> = ({
       headerName: "Actions",
       width: 200,
       cellClassName: "actions",
-      getActions: ({ id }) => {
+      getActions: ({ id, row }) => {
         const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
 
         if (isInEditMode) {
@@ -217,7 +218,7 @@ const CustomTable: FC<ICustomTableProps> = ({
           <GridActionsCellItem
             icon={<DeleteIcon />}
             label="Delete"
-            onClick={handleDeleteClick(id)}
+            onClick={handleDeleteClick(id, row.storeID)}
             color="inherit"
           />,
         ];

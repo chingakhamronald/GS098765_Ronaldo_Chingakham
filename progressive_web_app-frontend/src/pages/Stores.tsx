@@ -6,6 +6,7 @@ import { useStores } from "../hooks/query/useStores";
 import { useUpdateStore } from "../hooks/mutation/useUpdateStore";
 import { IStore } from "../type";
 import { useCreateStore } from "../hooks/mutation/useCreateStore";
+import { useDeleteStore } from "../hooks/mutation/useDeleteStore";
 
 const column: GridColDef[] = [
   {
@@ -48,6 +49,8 @@ const Stores: FC = () => {
 
   const { mutate: createMutate } = useCreateStore();
 
+  const { mutate: removeStore } = useDeleteStore();
+
   return (
     <Box
       component="main"
@@ -79,6 +82,7 @@ const Stores: FC = () => {
             name="store"
             createMutate={createMutate}
             updateMutate={mutate}
+            deleteMutate={removeStore}
           />
         )}
       </Box>
