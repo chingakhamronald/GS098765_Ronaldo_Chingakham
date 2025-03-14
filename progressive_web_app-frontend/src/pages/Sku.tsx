@@ -5,6 +5,7 @@ import { currencyFormatter } from "../utils";
 import { useSku } from "../hooks/query/useSku";
 import { ISku } from "../type";
 import { useUpdateSku } from "../hooks/mutation/useUpdateSku";
+import { useCreateSku } from "../hooks/mutation/useCreateSku";
 
 const usdPrice: GridColTypeDef = {
   type: "number",
@@ -35,6 +36,8 @@ const column: GridColDef[] = [
 const Sku = () => {
   const { data, isLoading, isFetching } = useSku();
   const { mutate } = useUpdateSku();
+
+  const { mutate: createSku } = useCreateSku();
 
   const initialSkuData = data?.data.map((e: ISku, idx: number) => {
     const price = e.price.split("$").pop();
@@ -78,7 +81,8 @@ const Sku = () => {
             col={column}
             init={initialSkuData}
             name="sku"
-            mutate={mutate}
+            createMutate={createSku}
+            updateMutate={mutate}
           />
         )}
       </Box>

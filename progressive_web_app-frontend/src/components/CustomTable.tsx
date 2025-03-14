@@ -13,7 +13,7 @@ import {
   GridSlotProps,
   GridToolbarContainer,
 } from "@mui/x-data-grid";
-import { FC, use, useState } from "react";
+import { FC, useState } from "react";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import SaveIcon from "@mui/icons-material/Save";
@@ -21,7 +21,6 @@ import CancelIcon from "@mui/icons-material/Close";
 import AddIcon from "@mui/icons-material/Add";
 import { useUpdateStore } from "../hooks/mutation/useUpdateStore";
 import { useCreateStore } from "../hooks/mutation/useCreateStore";
-import { IStorePostData } from "../type";
 
 declare module "@mui/x-data-grid" {
   interface ToolbarPropsOverrides {
@@ -37,6 +36,8 @@ interface ICustomTableProps {
   col: GridColDef[];
   init: GridRowsProp;
   name: string;
+  updateMutate?: any;
+  createMutate?: any;
 }
 
 function EditToolbar(props: GridSlotProps["toolbar"]) {
@@ -86,14 +87,16 @@ function EditToolbar(props: GridSlotProps["toolbar"]) {
   );
 }
 
-const CustomTable: FC<ICustomTableProps> = ({ col, init, name }) => {
+const CustomTable: FC<ICustomTableProps> = ({
+  col,
+  init,
+  name,
+  createMutate,
+  updateMutate,
+}) => {
   const [rows, setRows] = useState(init);
 
   const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
-
-  const { mutate } = useUpdateStore();
-
-  const { mutate: createMutate } = useCreateStore();
 
   const handleRowEditStop: GridEventListener<"rowEditStop"> = (
     params,
@@ -162,7 +165,7 @@ const CustomTable: FC<ICustomTableProps> = ({ col, init, name }) => {
         },
       });
     } else {
-      mutate(storeData, {
+      updateMutate(storeData, {
         onSuccess: () => {
           setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
         },

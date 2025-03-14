@@ -5,6 +5,7 @@ import { FC } from "react";
 import { useStores } from "../hooks/query/useStores";
 import { useUpdateStore } from "../hooks/mutation/useUpdateStore";
 import { IStore } from "../type";
+import { useCreateStore } from "../hooks/mutation/useCreateStore";
 
 const column: GridColDef[] = [
   {
@@ -43,6 +44,10 @@ const Stores: FC = () => {
     store: e.storeName,
   }));
 
+  const { mutate } = useUpdateStore();
+
+  const { mutate: createMutate } = useCreateStore();
+
   return (
     <Box
       component="main"
@@ -68,7 +73,13 @@ const Stores: FC = () => {
             <CircularProgress color="secondary" size={25} />
           </Box>
         ) : (
-          <CustomTable col={column} init={initialStoresData} name="store" />
+          <CustomTable
+            col={column}
+            init={initialStoresData}
+            name="store"
+            createMutate={createMutate}
+            updateMutate={mutate}
+          />
         )}
       </Box>
     </Box>
