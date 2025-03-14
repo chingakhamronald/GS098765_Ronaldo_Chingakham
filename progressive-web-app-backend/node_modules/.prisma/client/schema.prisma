@@ -64,8 +64,8 @@ model Planning {
   week    String
 
   weekId Week   @relation(fields: [week], references: [week])
-  store  Stores @relation(fields: [storeId], references: [storeId])
-  sku    Sku    @relation(fields: [skuId], references: [skuId])
+  store  Stores @relation(fields: [storeId], references: [storeId], onDelete: Cascade)
+  sku    Sku    @relation(fields: [skuId], references: [skuId], onDelete: Cascade)
 
   createdAt DateTime @default(now())
 }

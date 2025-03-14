@@ -7,6 +7,8 @@ const prisma = new PrismaClient();
 export const createStore = async (req: Request, res: Response) => {
   const { storeName, ...props } = req.body;
 
+  console.log({ "storeName....": storeName });
+
   try {
     const createStore = await prisma.stores.create({
       data: { storeName, ...props },
@@ -61,10 +63,16 @@ export const updateStore = async (req: Request, res: Response) => {
 export const deleteStore = async (req: Request, res: Response) => {
   const { storeId } = req.params;
 
+  console.log({
+    "store...": storeId,
+  });
+
   try {
     const existingStore = await prisma.stores.findUnique({
       where: { storeId },
     });
+
+    console.log(existingStore);
 
     if (!existingStore) {
       return res
@@ -72,15 +80,20 @@ export const deleteStore = async (req: Request, res: Response) => {
         .json({ success: false, message: "Store not found!" });
     }
 
+    console.log("CEHCK....DATA");
+
     // Perform delete operation
-    await prisma.stores.delete({
+    const removeData = await prisma.stores.delete({
       where: { storeId },
     });
+
+    console.log({ "REMOVE>>>>DATA>>>": removeData });
 
     res
       .status(200)
       .json({ success: true, message: "Store deleted successfully!" });
   } catch (error) {
+    console.log(JSON.stringify(error, null, 2));
     res.status(500).json({ success: false, message: "Internal server error!" });
   }
 };
