@@ -7,6 +7,7 @@ import {
   ColDef,
   ColGroupDef,
   ModuleRegistry,
+  PaginationModule,
   ValidationModule,
   ValueParserParams,
 } from "ag-grid-community";
@@ -25,6 +26,7 @@ ModuleRegistry.registerModules([
   ClientSideRowModelModule,
   CellStyleModule,
   ValidationModule /* Development Only */,
+  PaginationModule,
 ]);
 
 const widthCell = 250;
@@ -103,6 +105,10 @@ const Planning = () => {
     return { saleDollar, gmDollar, gmPercent };
   }, []);
 
+  const paginationPageSizeSelector = useMemo<number[] | boolean>(() => {
+    return [20, 50, 100];
+  }, []);
+
   const rowData = useMemo(() => {
     if (!data) return [];
 
@@ -137,7 +143,13 @@ const Planning = () => {
         sx={{ height: "100%", width: "100%", flexGrow: 1 }}
         component={Paper}
       >
-        <AgGridReact<IPlaningData> rowData={rowData} columnDefs={columnDefs} />
+        <AgGridReact<IPlaningData>
+          rowData={rowData}
+          columnDefs={columnDefs}
+          pagination={true}
+          paginationPageSize={20}
+          paginationPageSizeSelector={paginationPageSizeSelector}
+        />
       </Box>
     </Box>
   );
