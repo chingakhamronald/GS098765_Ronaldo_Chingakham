@@ -7,91 +7,40 @@ import {
   ColDef,
   ColGroupDef,
   ModuleRegistry,
+  PaginationChangedEvent,
   PaginationModule,
-  ValidationModule,
-  ValueParserParams,
 } from "ag-grid-community";
 import { usePlanning } from "../hooks/query/usePlanning";
 import "../index.css";
-export interface IPlaningData {
+
+export interface IPlanningData {
   store: string;
   sku: string;
   sales_units: string;
-  sales_dollers: string;
-  gm_dollers: string;
+  sales_dollars: string;
+  gm_dollars: string;
   gm_percent: string;
 }
 
 ModuleRegistry.registerModules([
   ClientSideRowModelModule,
   CellStyleModule,
-  ValidationModule /* Development Only */,
   PaginationModule,
 ]);
 
 const widthCell = 250;
 
 const Planning = () => {
-  const numberParser = (params: ValueParserParams) => {
-    console.log(params);
-    const newValue = params.newValue;
-    let valueAsNumber;
-    if (newValue === null || newValue === undefined || newValue === "") {
-      valueAsNumber = null;
-    } else {
-      valueAsNumber = parseFloat(params.newValue);
-    }
-    return valueAsNumber;
-  };
+  const [rowData, setRowData] = useState<any[]>([]);
 
-  const [columnDefs, setColumnDefs] = useState<(ColDef | ColGroupDef)[]>([
-    {
-      headerName: "Store",
-      field: "store",
-      width: widthCell,
-    },
-    {
-      headerName: "SKU",
-      field: "sku",
-      width: widthCell,
-    },
-    {
-      headerName: "Feb",
-      children: [
-        {
-          headerName: "Week 01",
-          children: [
-            {
-              headerName: "Sales Units",
-              field: "sales_units",
-            },
-            {
-              headerName: "Sales Dollers",
-              field: "sales_dollars",
-            },
-            {
-              headerName: "GM Dollars",
-              field: "gm_dollars",
-            },
-            {
-              headerName: "GM Percent",
-              valueParser: numberParser,
-              field: "gm_percent",
-              flex: 1,
-              cellClassRules: {
-                "rag-green": "x >= 40",
-                "rag-yellow": "x >= 10 && x < 40",
-                "rag-orange": "x > 5 && x < 10",
-                "rag-red": "x <= 5",
-              },
-            },
-          ],
-        },
-      ],
-    },
-  ]);
-
-  const { data } = usePlanning(20);
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetching,
+    hasPreviousPage,
+    fetchPreviousPage,
+  } = usePlanning(20);
 
   const priceCal = useCallback((e: any) => {
     let u = Math.round(e.units.split("$").pop());
@@ -105,17 +54,42 @@ const Planning = () => {
     return { saleDollar, gmDollar, gmPercent };
   }, []);
 
-  const paginationPageSizeSelector = useMemo<number[] | boolean>(() => {
-    return [20, 50, 100];
-  }, []);
+  const columnDefs: (ColDef | ColGroupDef)[] = [
+    { headerName: "Store", field: "store", width: widthCell },
+    { headerName: "SKU", field: "sku", width: widthCell },
+    {
+      headerName: "Feb",
+      children: [
+        {
+          headerName: "Week 01",
+          children: [
+            { headerName: "Sales Units", field: "sales_units" },
+            { headerName: "Sales Dollars", field: "sales_dollars" },
+            { headerName: "GM Dollars", field: "gm_dollars" },
+            {
+              headerName: "GM Percent",
+              field: "gm_percent",
+              flex: 1,
+              cellClassRules: {
+                "rag-green": "x >= 40",
+                "rag-yellow": "x >= 10 && x < 40",
+                "rag-orange": "x > 5 && x < 10",
+                "rag-red": "x <= 5",
+              },
+            },
+          ],
+        },
+      ],
+    },
+  ];
 
-  const rowData = useMemo(() => {
+  // Process API data and merge with existing data
+  useMemo(() => {
     if (!data) return [];
 
-    return data.pages.flatMap((e) =>
+    const newRows = data?.pages?.flatMap((e) =>
       e.data.map((item: any) => {
         const calDollarAndCost = priceCal(item);
-
         return {
           store: item.store.storeName,
           sku: item.sku.skuName,
@@ -126,7 +100,21 @@ const Planning = () => {
         };
       })
     );
+
+    setRowData((prev) => [...prev, ...newRows]); // Append new data instead of replacing
   }, [data]);
+
+  const onPaginationChanged = useCallback(
+    (e: PaginationChangedEvent<IPlanningData>) => {
+      const currentPage = e.api.paginationGetCurrentPage();
+      const totalPages = e.api.paginationGetTotalPages();
+
+      if (currentPage + 1 >= totalPages && hasNextPage && !isFetching) {
+        fetchNextPage();
+      }
+    },
+    [fetchNextPage, hasNextPage, isFetching]
+  );
 
   return (
     <Box
@@ -143,12 +131,12 @@ const Planning = () => {
         sx={{ height: "100%", width: "100%", flexGrow: 1 }}
         component={Paper}
       >
-        <AgGridReact<IPlaningData>
+        <AgGridReact<IPlanningData>
           rowData={rowData}
           columnDefs={columnDefs}
           pagination={true}
           paginationPageSize={20}
-          paginationPageSizeSelector={paginationPageSizeSelector}
+          onPaginationChanged={onPaginationChanged}
         />
       </Box>
     </Box>

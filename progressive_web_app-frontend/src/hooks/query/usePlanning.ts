@@ -13,6 +13,10 @@ export const usePlanning = (limit = 20) => {
       return await res.data;
     },
     getNextPageParam: (nextPage, allPage) => {
+      console.log({
+        "hasNextPage...": nextPage.pagination.hasNextPage,
+        "allPage....": allPage.length + 1,
+      });
       return nextPage.pagination.hasNextPage ? allPage.length + 1 : undefined;
     },
     getPreviousPageParam: (prevPage, allPage) => {
