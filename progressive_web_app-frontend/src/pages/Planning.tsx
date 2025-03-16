@@ -33,14 +33,7 @@ const widthCell = 250;
 const Planning = () => {
   const [rowData, setRowData] = useState<any[]>([]);
 
-  const {
-    data,
-    fetchNextPage,
-    hasNextPage,
-    isFetching,
-    hasPreviousPage,
-    fetchPreviousPage,
-  } = usePlanning(20);
+  const { data, fetchNextPage, hasNextPage, isFetching } = usePlanning(20);
 
   const priceCal = useCallback((e: any) => {
     let u = Math.round(e.units.split("$").pop());
